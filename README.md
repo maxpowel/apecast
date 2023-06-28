@@ -60,11 +60,18 @@ I will probably add more news sites to crawl and more integration with ApeCoin D
 I `do not` have in mind to include functionalities about sending/receiving apecoins. The reason is that once you do stuff like this, people has to trust you and you become an objective for cyberthieves. I want that the people using this bot is 100% secure and 0% risks. And this is the only way (by not implementing this stuff).
 
 
-## Want to run it?
+## Want to build it?
 
 This bot is written in [Rust](https://www.rust-lang.org/). I like rust because it is secure, fast and fun. You can run it even in a raspberry pi very smoothly (you will not even notice about this process).
 
-So the steps are simple, first clone the repo
+The easy way is using `cargo`:
+```
+cargo install apecast
+```
+Done!
+
+But you want to build it manually form the repo the steps are also simple.
+First clone the repo
 ```
 git clone https://github.com/maxpowel/apecast
 ```
@@ -83,7 +90,10 @@ Now run it!
 You only need this binary. No extra dependencies instal, libs or whatever. Just a file.
 It is ready to be built for ARM (like raspberry pi) and many others. Check [cross](https://github.com/cross-rs/cross) for more information.
 
-To finally run in, create a telegram bot (tal to [@BotFather](https://t.me/BotFather) or read [this](https://core.telegram.org/bots/tutorial)) and run a mongodb database. With docker is as simple as
+
+## Running it
+
+To finally run it, create a telegram bot (tal to [@BotFather](https://t.me/BotFather) or read [this](https://core.telegram.org/bots/tutorial)) and run a mongodb database. With docker is as simple as
 
 ```
 docker run --rm -p 27017:27017 --name mongo  mongo:latest
@@ -93,11 +103,11 @@ You can also get a free hosted database at [mongodb](https://www.mongodb.com/) (
 Finally, you can run it using env variables (nice when deploying to production severs)
 
 ```
-MONGODB="mongodb://localhost/apecast" TELEGRAM_TOKEN=MyBotToken ./apecast
+MONGODB="mongodb://localhost/apecast" TELEGRAM_TOKEN=MyBotToken apecast
 ```
 or with parameters
 ```
-./apecast --mongodb="mongodb://localhost/apecast" --telegram-token="MyBotToken"
+apecast --mongodb="mongodb://localhost/apecast" --telegram-token="MyBotToken"
 ```
 
 If you want, you can provide an `etherscan` token. This is not required but without it, the
