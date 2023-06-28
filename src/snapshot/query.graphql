@@ -1,0 +1,19 @@
+query Proposals {
+  proposals(
+    first: 20,
+    skip: 0,
+    where: {
+      space_in: ["apecoin.eth"],
+      state: "active"
+    },
+    orderBy: "created",
+    orderDirection: desc
+  ) {
+    id
+    title
+    end
+    state
+    author
+  }
+}
+

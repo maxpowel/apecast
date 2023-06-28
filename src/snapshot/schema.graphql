@@ -1,0 +1,31 @@
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+type Query {
+    proposals(
+        first: Int,
+        skip: Int,
+        where: ProposalWhere,
+        orderBy: String,
+        orderDirection: String,
+    ):[Proposal]
+}
+
+type Proposal {
+    id: String!
+    title: String!
+    body: String
+    choices: [String]!
+    start: Int!
+    end: Int!
+    snapshot: String
+    state: String
+    author: String!
+}
+
+type ProposalWhere {
+    space_in: [String]
+    state: String
+}
