@@ -31,12 +31,17 @@ impl EtherscanClient {
 
     pub async fn balance(&self, address: &str) -> Result<f64> {
         let url = format!("https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=0x4d224452801aced8b2f0aebe155379bb5d594381&address={}&tag=latest&apikey={}", address, self.token);
-        let res: BalanceResponse = reqwest::get(url).await?.json().await?;
+        let res: BalanceResponse = reqwest::get(&url).await?.json().await?;
         if res.status != 1 {
             Err(anyhow::anyhow!("{}", res.message))
         } else {
-            let amount: f64 = (res.result[0..res.result.len() - 15]).parse().unwrap();
-            Ok(amount/1000.0)
+            if res.result.len() < 18 {
+                Ok(0.0)
+            } else {
+                let amount: f64 = (res.result[0..res.result.len() - 15]).parse().unwrap();
+                Ok(amount/1000.0)
+            }
+            
         }
     }
 }
