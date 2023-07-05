@@ -3,6 +3,7 @@
     <h1><code>APECAST</code></h1>
 </div>
 
+[APECAST](https://t.me/ApeCastBot)
 
 ## What is this?
 This is a telegram bot that helps you to keep updated about Apecoin. Nowadays there are so many data sources and handling them manually it is pretty impossible for an ape being. This bot summarizes
@@ -45,6 +46,9 @@ Price
 -----
 Appart from the subscription, you can ask anytime the current price of `Apecoin`. The bot gathers information from several exchanges and send it to you summarized.
 
+Thankape
+--------
+You will get notifications when a new contribution is available at [thankape](https://thankape.com/) if you are subscribed to `news` event
 
 ## Next steps
 I just automated some tasks that save time to me. I the bot can help you in any way, you can tell me and I will include it. Appart from these requests, I'm focus on the `inlinequery` feature. Currently it is pretty simple and you can just list and filter the current proposals

@@ -5,6 +5,7 @@ mod cryptodaily;
 mod newsbtc;
 mod utoday;
 mod apecoin;
+mod thrivecoin;
 
 pub use apecoin::apecoin_monitor;
 use std::pin::Pin;
@@ -19,6 +20,7 @@ type Crawler = Pin<Box<dyn futures::Future<Output = Result<Option<String>>>>>;
 pub async fn news(db: std::sync::Arc<Database>) -> Result<Vec<String>> {
 
     let crawlers: Vec<Crawler> = vec![
+        Box::pin(thrivecoin::latest(db.clone())),
         Box::pin(beincrypto::latest(db.clone())),
         Box::pin(coindesk::latest(db.clone())),
         Box::pin(cointelegraph::latest(db.clone())),
@@ -46,3 +48,4 @@ pub async fn proposals(db: std::sync::Arc<Database>) -> Result<Vec<String>> {
     Ok(props)
 
 }
+
