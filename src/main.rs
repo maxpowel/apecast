@@ -35,7 +35,7 @@ struct Args {
 #[tokio::main]
 async fn main() -> Result<()> {
 
-    let (closer, exit) = init(None).await?;
+    let (closer, exit) = init(Some("apecast.log")).await?;
     let args = Args::parse();
 
     match get_database(&args.mongodb).await {
@@ -68,6 +68,11 @@ async fn main() -> Result<()> {
                             let msg = format!("New proposal! Check it out {}", prop);
                             crate::telegram::broadcast_message(bot.clone(), db.clone(), &msg, "proposal").await?;
                         }
+                        info!("Checking thankape contributions");
+                        if let Some(contribution) = crate::monitor::contributions(db.clone()).await? {
+                            crate::telegram::broadcast_message(bot.clone(), db.clone(), &contribution, "thankape").await?;
+                        }
+                        
                     },
                     msg = broadcast_receiver.recv_async() => {
                         match msg {

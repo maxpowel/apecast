@@ -1,5 +1,5 @@
 
-use std::error::Error;
+use std::{error::Error, collections::HashSet};
 use std::sync::Arc;
 use teloxide::{
     prelude::{Message, Dialogue, Update, Bot, Requester, Request, Dispatcher, dptree}, 
@@ -53,7 +53,7 @@ enum Command {
     Subscribe,
 
     #[command(description = "Check active subscriptions")]
-    Subscribed,
+    Subscriptions,
 
     #[command(description = "Unsubscribe to events")]
     Unsubscribe,
@@ -103,6 +103,8 @@ async fn callback_handler(bot: Arc<Bot>, q: CallbackQuery, db: Arc<Database>) ->
                             Some(format!("Subscribed to {}! You will receive a message when a new proposal is listed", value))
                         } else if value.eq("news") {
                             Some(format!("Subscribed to {}! You will receive a message when some relevant information about apecoin is published", value))
+                        } else if value.eq("thankape") {
+                            Some(format!("Subscribed to {}! You will receive a message a new way of contribution is published at thrivecoin", value))
                         } else {
                             Some(format!("Subscribed to {}!", value))
                         }
@@ -287,10 +289,19 @@ async fn answer(
             bot.send_message(message.chat.id, proposals.join("\n")).parse_mode(ParseMode::Html).await?;
         }
         Command::Subscribe => {
-            let keyboard = make_keyboard("sub", vec!["price", "proposal", "news", "cancel"]);
-            bot.send_message(message.chat.id, "What kind of event you want to subscribe?").reply_markup(keyboard).await?;
+            let user_subs: HashSet<String> = crate::storage::subscribed(db, &message.chat.id).await?.into_iter().collect();
+            let available_subs: HashSet<String> = vec!["thankape", "price", "proposal", "news"].into_iter().map(|a| a.to_owned()).collect();
+            let mut subs: Vec<&str> = available_subs.difference(&user_subs).into_iter().map(|a| a.as_str()).collect();
+            subs.sort();
+            if subs.is_empty() {
+                bot.send_message(message.chat.id, "You are already subscribed to all events").await?;
+            } else {
+                subs.push("cancel");
+                let keyboard = make_keyboard("sub", subs);
+                bot.send_message(message.chat.id, "What kind of event do you want to subscribe?").reply_markup(keyboard).await?;
+            }
         }
-        Command::Subscribed => {
+        Command::Subscriptions => {
             let subs = crate::storage::subscribed(db, &message.chat.id).await?;
             let text = if subs.is_empty() {
                 "Not subscribed to anything...".to_owned()
@@ -308,7 +319,7 @@ async fn answer(
             } else {
                 subs.push("cancel".to_owned());
                 let keyboard = make_keyboard("unsub", subs.iter().map(|s| s.as_str()).collect());
-                bot.send_message(message.chat.id, "What kind of event you want to unsubscribe?:").reply_markup(keyboard).await?;
+                bot.send_message(message.chat.id, "What kind of event you want to unsubscribe?").reply_markup(keyboard).await?;
             }
             
         }

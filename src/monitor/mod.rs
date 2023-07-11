@@ -20,7 +20,6 @@ type Crawler = Pin<Box<dyn futures::Future<Output = Result<Option<String>>>>>;
 pub async fn news(db: std::sync::Arc<Database>) -> Result<Vec<String>> {
 
     let crawlers: Vec<Crawler> = vec![
-        Box::pin(thrivecoin::latest(db.clone())),
         Box::pin(beincrypto::latest(db.clone())),
         Box::pin(coindesk::latest(db.clone())),
         Box::pin(cointelegraph::latest(db.clone())),
@@ -49,3 +48,6 @@ pub async fn proposals(db: std::sync::Arc<Database>) -> Result<Vec<String>> {
 
 }
 
+pub async fn contributions(db: std::sync::Arc<Database>) -> Result<Option<String>> {
+    Ok(thrivecoin::latest(db.clone()).await?)
+}

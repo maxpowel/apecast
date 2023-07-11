@@ -17,6 +17,10 @@ and gathers relevant information and at the same time it can answer some queries
 ## Features
 The objective of these features is to save time while being simple. If you miss something please tell me so I can implement it.
 
+[Thankape](https://thankape.com/) contributions
+----------------------
+Via [thrivecoin](https://app.thrivecoin.com/) you can see some ways to contribute. Some of them are available only in a specific window
+frame but this bot can notify you as soon as they are published so you will not miss them.
 
 Active proposals
 ----------------
@@ -26,6 +30,8 @@ It is easy to access to `https://snapshot.org/#/apecoin.eth` but it is even easi
 Subscriptions
 -------------
 There are three kind of subscriptions:
+
+* thankape: This event will notify when a new way to contribute is available.
 
 * proposals: Get a notification when there is a new proposal at `https://snapshot.org/#/apecoin.eth` so you will not miss any
 
@@ -46,9 +52,6 @@ Price
 -----
 Appart from the subscription, you can ask anytime the current price of `Apecoin`. The bot gathers information from several exchanges and send it to you summarized.
 
-Thankape
---------
-You will get notifications when a new contribution is available at [thankape](https://thankape.com/) if you are subscribed to `news` event
 
 ## Next steps
 I just automated some tasks that save time to me. I the bot can help you in any way, you can tell me and I will include it. Appart from these requests, I'm focus on the `inlinequery` feature. Currently it is pretty simple and you can just list and filter the current proposals
