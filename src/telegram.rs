@@ -13,6 +13,7 @@ use chrono::{Utc, NaiveDateTime, DateTime};
 use anyhow::Result;
 use tokio_stream::StreamExt;
 use crate::exchanges::exchange_info;
+use crate::search::Search;
 
 use teloxide::dispatching::dialogue::InMemStorage;
 
@@ -69,11 +70,11 @@ enum Command {
 }
 
 /// Initialize a bot instance
-pub async fn new_bot(token: &str, etherscan: Arc<crate::etherscan::EtherscanClient>, db: Arc<Database>) -> (Arc<teloxide::Bot>, flume::Sender<i32>, tokio::task::JoinHandle<()>) {
+pub async fn new_bot(token: &str, etherscan: Arc<crate::etherscan::EtherscanClient>, db: Arc<Database>, search: Arc<Search>) -> (Arc<teloxide::Bot>, flume::Sender<i32>, tokio::task::JoinHandle<()>) {
     let bot = Arc::new(Bot::new(token));
     bot.set_my_commands(Command::bot_commands()).await.unwrap();
     let (telegram_sender, telegram_receiver) = flume::unbounded();
-    (bot.clone(), telegram_sender, tokio::spawn(tele(bot.clone(), telegram_receiver, db, etherscan)))
+    (bot.clone(), telegram_sender, tokio::spawn(tele(bot.clone(), telegram_receiver, db, etherscan, search)))
 }
 
 /// Send an notification to all users subscribed to the subscription type
@@ -144,34 +145,30 @@ async fn callback_handler(bot: Arc<Bot>, q: CallbackQuery, db: Arc<Database>) ->
 async fn inline_query_handler(
     bot: Arc<Bot>,
     q: InlineQuery,
+    search: Arc<Search>,
 ) -> Result<(), Box<dyn Error + Send + Sync>> {
     
-    let props = crate::snapshot::get_proposals().await?;
-    let results = props.into_iter().enumerate().filter_map(|(index, prop)| 
-        if prop.title.contains(&q.query) {
-        Some(InlineQueryResult::Article(InlineQueryResultArticle::new(
-            index.to_string(),
-            &prop.title,
-            InputMessageContent::Text(InputMessageContentText::new(format!(
-                "https://snapshot.org/#/apecoin.eth/proposal/{}",
-                prop.id
-            ))),
+    let results = search.search(&q.query).await?.into_iter().map(|res| {
+        let hint = res.hint(&q.query);
+        InlineQueryResult::Article(InlineQueryResultArticle::new(
+            format!("{}:{}",res.id, q.query),
+            res.title,
+            InputMessageContent::Text(InputMessageContentText::new(format!("{} {}", hint, res.url))),
         )
-        .description("Proposal")
-        .thumb_url("https://cdn.stamp.fyi/space/apecoin.eth?s=160&cb=ec19915e02892e80".parse().unwrap())
-        .url(format!("https://snapshot.org/#/apecoin.eth/proposal/{}", prop.id).parse().unwrap())))}
-        else {None}
-    );
+        .description(&hint)
+        .thumb_url(res.thumb.parse().unwrap())
+        .url(res.url.parse().unwrap()))
+    });
 
     let response = bot.answer_inline_query(&q.id, results).send().await;
     if let Err(err) = response {
-        log::error!("Error in handler: {:?}", err);
+        log::error!("Error in handler: {:?} with query {}", err, q.query);
     }
     Ok(())
 }
 
 /// Task run by the telegram bot
-async fn tele(bot: Arc<Bot>, exit: flume::Receiver<i32>, db: Arc<Database>, etherscan: Arc<crate::etherscan::EtherscanClient>) {
+async fn tele(bot: Arc<Bot>, exit: flume::Receiver<i32>, db: Arc<Database>, etherscan: Arc<crate::etherscan::EtherscanClient>, search: Arc<Search>) {
 
     let handler = dptree::entry()
     .branch(Update::filter_message()
@@ -182,7 +179,7 @@ async fn tele(bot: Arc<Bot>, exit: flume::Receiver<i32>, db: Arc<Database>, ethe
     .branch(Update::filter_message().endpoint(any_message));
 
     let mut dispatcher = Dispatcher::builder(bot.clone(), handler)
-    .dependencies(dptree::deps![db.clone(), InMemStorage::<State>::new(), etherscan.clone()])
+    .dependencies(dptree::deps![db.clone(), InMemStorage::<State>::new(), etherscan.clone(), search.clone()])
     .build();
 
     let token = dispatcher.shutdown_token();

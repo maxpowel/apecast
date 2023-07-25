@@ -5,7 +5,9 @@ mod storage;
 mod exchanges;
 mod etherscan;
 mod monitor;
+mod search;
 
+use meilisearch_sdk::Client;
 use tokio::time;
 use clap::Parser;
 use anyhow::Result;
@@ -29,6 +31,14 @@ struct Args {
     /// etherscan bot token
     #[arg(short, long, env)]
     etherscan_token: Option<String>,
+
+    /// Search uri
+    #[arg(long, env, default_value="http://localhost:7700")]
+    search_uri: String,
+
+    /// Search token
+    #[arg(long, env, default_value="masterKey")]
+    search_token: String,
 }
 
 
@@ -41,8 +51,10 @@ async fn main() -> Result<()> {
     match get_database(&args.mongodb).await {
         Ok(db) => {
             let db = std::sync::Arc::new(db);
+            let search = std::sync::Arc::new(search::Search::new(&args.search_uri, &args.search_token));
+
             let etherscan = std::sync::Arc::new(etherscan::EtherscanClient::new(args.etherscan_token));
-            let (bot, bot_exit, bot_join_handle) = telegram::new_bot(&args.telegram_token, etherscan, db.clone()).await;
+            let (bot, bot_exit, bot_join_handle) = telegram::new_bot(&args.telegram_token, etherscan, db.clone(), search).await;
             // Apecoin monitor
             let (broadcast_sender, broadcast_receiver) = flume::unbounded();
             let (monitor_join, monitor_exit) = monitor::apecoin_monitor(db.clone(), broadcast_sender)?;

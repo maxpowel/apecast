@@ -1,6 +1,6 @@
 [package]
 name = "apecast"
-version = "0.1.3"
+version = "0.1.4"
 edition = "2021"
 license-file = "LICENSE"
 description = "A telegram bot for apes"
@@ -31,3 +31,4 @@ serde-aux = "4.2.0"
 graphql_client = "0.13.0"
 scraper = "0.16.0"
 crypto-com-exchange = "1.0.2"
+meilisearch-sdk = "0.24.1"

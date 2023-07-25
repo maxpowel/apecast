@@ -53,6 +53,11 @@ Price
 Appart from the subscription, you can ask anytime the current price of `Apecoin`. The bot gathers information from several exchanges and send it to you summarized.
 
 
+Forum Link Sharing
+------------------
+You can easily share links to forum posts. Just write `@apecastbot your query` on any chat and some search results will be shown. Click the desired one and you will share the link in this conversation
+
+
 ## Next steps
 I just automated some tasks that save time to me. I the bot can help you in any way, you can tell me and I will include it. Appart from these requests, I'm focus on the `inlinequery` feature. Currently it is pretty simple and you can just list and filter the current proposals
 
@@ -107,6 +112,12 @@ docker run --rm -p 27017:27017 --name mongo  mongo:latest
 ```
 You can also get a free hosted database at [mongodb](https://www.mongodb.com/) (the free tier is more than enough).
 
+You also need [meilisearch](https://github.com/meilisearch/meilisearch) for full text search. Installing and running it is as simple as:
+```
+curl -L https://install.meilisearch.com | sh
+./meilisearch --master-key=masterKey
+```
+
 Finally, you can run it using env variables (nice when deploying to production severs)
 
 ```
@@ -137,6 +148,7 @@ Several tools and libraries has been used. All of them are public and accesible 
 * Price monitor: [crypto.com](https://exchange-docs.crypto.com/spot/index.html#websocket-root-endpoints ) `websocket api` and [rs-crypto-com-exchange](https://github.com/maxpowel/rs-crypto-com-exchange) library.
 * Crawlers: Just [reqwest](https://docs.rs/reqwest/latest/reqwest/) as `http client` and [scraper](https://docs.rs/scraper/latest/scraper/) for web parsing
 * Telegram: Obviusly telegram. And as a library [teloxide](https://github.com/teloxide/teloxide)
+* Full text search: [meilisearch](https://github.com/meilisearch/meilisearch)
 
 
 
