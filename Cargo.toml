@@ -32,3 +32,7 @@ graphql_client = "0.13.0"
 scraper = "0.16.0"
 crypto-com-exchange = "1.0.2"
 meilisearch-sdk = "0.24.1"
+
+[dependencies.isahc]
+default-features = false
+features = ["static-ssl"]
