@@ -92,7 +92,7 @@ async fn main() -> Result<()> {
                                 crate::telegram::broadcast_message(bot.clone(), db.clone(), &message, "price").await?;
                             },
                             Err(error) => {
-                                error!("{}", error);
+                                error!("Apecoin monitor error: {}", error);
                             }
                         }
                         
@@ -104,7 +104,7 @@ async fn main() -> Result<()> {
             monitor_join.await?;
         }
         Err(err) => {
-            error!("{}", err);
+            error!("Database error: {}", err);
         }
     }
 

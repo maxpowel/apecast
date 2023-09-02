@@ -39,7 +39,7 @@ pub async fn event_handler(event: Result<SubscribeResult>, container: std::sync:
             }
         },
         Err(error) => {
-            error!("{:?}", error);
+            error!("Event error: {:?}", error);
         }
     }
 }
