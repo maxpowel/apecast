@@ -118,7 +118,7 @@ checksum = "9c7d0618f0e0b7e8ff11427422b64564d5fb0be1940354bfe2e0529b18a9d9b8"
 
 [[package]]
 name = "apecast"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "anyhow",
  "chrono",
@@ -466,9 +466,9 @@ dependencies = [
 
 [[package]]
 name = "crypto-com-exchange"
-version = "1.0.6"
+version = "1.0.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "305b9bc8733a486b0e2cea81a2c713dc4f56ca567a16a38fa828576845407c2a"
+checksum = "beb46cab474d10960c47e845cd00ca583d42845e9a076c2406a54d0ffa16570c"
 dependencies = [
  "anyhow",
  "chrono",
