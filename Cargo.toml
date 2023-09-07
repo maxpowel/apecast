@@ -34,5 +34,6 @@ crypto-com-exchange = "1.0.7"
 meilisearch-sdk = "0.24.1"
 
 [dependencies.isahc]
+version="1.7.2"
 default-features = false
 features = ["static-ssl"]
