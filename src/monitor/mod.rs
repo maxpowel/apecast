@@ -9,7 +9,7 @@ mod thrivecoin;
 
 pub use apecoin::apecoin_monitor;
 use std::pin::Pin;
-use log::info;
+use log::{info, error};
 use anyhow::Result;
 use mongodb::Database;
 
@@ -29,7 +29,10 @@ pub async fn news(db: std::sync::Arc<Database>) -> Result<Vec<String>> {
     ];
 
     let new_news: Vec<String> = futures::future::join_all(crawlers).await
-        .into_iter().filter_map(|f| if let Ok(f) = f {f} else {None}).collect();
+        .into_iter().filter_map(|f| if let Ok(f) = f {f} else {
+            error!("News error: {:?}", f);
+            None
+        }).collect();
 
     Ok(new_news)
 
