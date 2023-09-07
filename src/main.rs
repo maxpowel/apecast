@@ -72,17 +72,45 @@ async fn main() -> Result<()> {
                     },
                     _ = crawl_interval.tick() => {
                         info!("Crawl time!");
-                        for news in crate::monitor::news(db.clone()).await? {
-                            crate::telegram::broadcast_message(bot.clone(), db.clone(), &news, "news").await?;
+                        match crate::monitor::news(db.clone()).await {
+                            Ok(res) => {
+                                    for news in res {
+                                    if let Err(error) = crate::telegram::broadcast_message(bot.clone(), db.clone(), &news, "news").await {
+                                        error!("Cannot broadcast news message: {:?}", error);
+                                    }
+                                }
+                            }, 
+                            Err(error) => {
+                                error!("News error: {:?}", error);
+                            }
                         }
                         info!("Looking for new proposals");
-                        for prop in crate::monitor::proposals(db.clone()).await? {
-                            let msg = format!("New proposal! Check it out {}", prop);
-                            crate::telegram::broadcast_message(bot.clone(), db.clone(), &msg, "proposal").await?;
+                        match crate::monitor::proposals(db.clone()).await {
+                            Ok(props) => {
+                                for prop in props {
+                                    let msg = format!("New proposal! Check it out {}", prop);
+                                    if let Err(error) = crate::telegram::broadcast_message(bot.clone(), db.clone(), &msg, "proposal").await {
+                                        error!("Cannot broadcast proposals message: {:?}", error);
+                                    }
+                                }
+                            }, 
+                            Err(error) => {
+                                error!("Proposals error: {:?}", error);
+                            }
                         }
+                        
                         info!("Checking thankape contributions");
-                        if let Some(contribution) = crate::monitor::contributions(db.clone()).await? {
-                            crate::telegram::broadcast_message(bot.clone(), db.clone(), &contribution, "thankape").await?;
+                        match crate::monitor::contributions(db.clone()).await {
+                            Ok(contribs) => {
+                                if let Some(contribution) = contribs {
+                                    if let Err(error) = crate::telegram::broadcast_message(bot.clone(), db.clone(), &contribution, "thankape").await {
+                                        error!("Cannot broadcast thankape message: {:?}", error);
+                                    }
+                                }
+                            }, 
+                            Err(error) => {
+                                error!("Contributions error: {:?}", error);
+                            }
                         }
                         
                     },
